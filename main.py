@@ -8,39 +8,48 @@ app = Flask(__name__)
 def index():
     return jsonify({"Choo Choo": "Welcome to your Flask app 🚅"})
 
-@app.route("/xpshort/<path:url>")
-def xpshort(url):
-    import time
-    import requests
-    from bs4 import BeautifulSoup 
-    client = requests.session()
-    DOMAIN = "https://xpshort.com/"
-    url = url[:-1] if url[-1] == '/' else url
-    code = url.split("/")[-1]
-    final_url = f"{DOMAIN}/{code}"
-    ref = "https://blog.finsurances.co/"
-    #ref = "https://www.jankarihoga.com/"
-    h = {"referer": ref}
-    resp = client.get(final_url,headers=h)
-    soup = BeautifulSoup(resp.content, "html.parser")
-    inputs = soup.find_all("input")
-    data = { input.get('name'): input.get('value') for input in inputs }
-    h = { "x-requested-with": "XMLHttpRequest" }  
-    time.sleep(8)
-    r = client.post(f"{DOMAIN}/links/go", data=data, headers=h)
-    try:
-        return redirect(r.json()['url'])
-    except: 
-        return "SomeThing went wrong"
+@app.route('/Cheatpdf_work', methods = ['POST'])
+def split_pdf():
+   if request.method == 'POST':
+        f = request.files['file']
+        f.save("node/"+f.filename)
+        pdf_file = open("node/"+f.filename, 'rb')
+        pdf_reader = PyPDF2.PdfReader(pdf_file)
+        pdf_output = PyPDF2.PdfWriter()
+        k=0
+        s=9 #No. of page per Page
+        nPage=len(pdf_reader.pages ) #no. of page
+        for i in range(s*2,(int(nPage/18)*18)+1,s*2):
+            for j in range(k,i,2):
+                print("==========>",j)
+                pdf_output.add_page(pdf_reader.pages[j])
+            for j in range(k+1,i+1,2):
+                pdf_output.add_page(pdf_reader.pages[j])
+                print("------------------------------>",j)
+            k=i
+        oPage=int(nPage%18)
+        if oPage:
+            for i in range(0,(oPage),2):
+                print("==========>------------",i+k)
+                pdf_output.add_page(pdf_reader.pages[i+k])
+            for i in range(10-round(oPage/2)):
+                pdf_output.add_blank_page()
+            for i in range(1,(oPage),2):
+                pdf_output.add_page(pdf_reader.pages[i+k])
 
-    
- 
-@app.route("/test/<path:url>")
-def xpshor1t(url):
-    import time
-    import requests
-    from bs4 import BeautifulSoup 
-    redirect("https://www.youtube.com/")
+        with open("node/"+f.filename,"wb") as (out):
+            pdf_output.write(out)
+        return send_file("node/"+f.filename,mimetype='application/pdf')
+   return "no file"
+
+@app.route('/Cheatpdf')
+def pdfGet():
+    html='''<form action = "/Cheatpdf_work" method = "post" enctype="multipart/form-data">
+        <input type="file" name="file" />
+        <input type = "submit" value="Upload">
+    </form>
+    '''
+    return html
 
 if __name__ == '__main__':
     app.run(debug=True, port=os.getenv("PORT", default=5000))
