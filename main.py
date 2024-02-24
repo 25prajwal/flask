@@ -12,8 +12,8 @@ def index():
 def split_pdf():
    if request.method == 'POST':
         f = request.files['file']
-        f.save("node/"+f.filename)
-        pdf_file = open("node/"+f.filename, 'rb')
+        f.save(f.filename)
+        pdf_file = open("f.filename, 'rb')
         pdf_reader = PyPDF2.PdfReader(pdf_file)
         pdf_output = PyPDF2.PdfWriter()
         k=0
@@ -37,7 +37,7 @@ def split_pdf():
             for i in range(1,(oPage),2):
                 pdf_output.add_page(pdf_reader.pages[i+k])
 
-        with open("node/"+f.filename,"wb") as (out):
+        with open("f.filename,"wb") as (out):
             pdf_output.write(out)
         return send_file("node/"+f.filename,mimetype='application/pdf')
    return "no file"
