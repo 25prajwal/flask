@@ -13,7 +13,7 @@ def split_pdf():
    if request.method == 'POST':
         f = request.files['file']
         f.save(f.filename)
-        pdf_file = open("f.filename, 'rb')
+        pdf_file = open(f.filename, 'rb')
         pdf_reader = PyPDF2.PdfReader(pdf_file)
         pdf_output = PyPDF2.PdfWriter()
         k=0
