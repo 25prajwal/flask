@@ -37,9 +37,9 @@ def split_pdf():
             for i in range(1,(oPage),2):
                 pdf_output.add_page(pdf_reader.pages[i+k])
 
-        with open("f.filename,"wb") as (out):
+        with open(f.filename,"wb") as (out):
             pdf_output.write(out)
-        return send_file("node/"+f.filename,mimetype='application/pdf')
+        return send_file(f.filename,mimetype='application/pdf')
    return "no file"
 
 @app.route('/Cheatpdf')
